@@ -229,7 +229,7 @@ for epoch in range(0, TRAIN_PARAMS.EPOCHS):
         LOG_CSV += f'{str(epoch+1)},{str(trew)},{str(pie.train_count)},{str(pie.update_count)}\n'
 
         if(max_reward1.full()):
-            if(np.mean(max_reward1.queue) >= 200):
+            if(np.mean(max_reward1.queue) >= 195):
                 break
 
 P('Finished Training!')
