@@ -10,7 +10,7 @@ ACCUMULATED_PARAMS = []
 LEARNING_RATE = 0.001
 ITERATION = -1
 N_PUSH = 200
-N_CLIENTS = 2
+N_CLIENTS = 1
 UPDATE_COUNT = 0
 MODEL_NAME = 'experiment_01'
 
@@ -109,16 +109,22 @@ def update_model():
     # Set Global Update Count
     UPDATE_COUNT = update_params['update_count']
 
+    print(len(ACCUMULATED_PARAMS), N_CLIENTS)
+
     # Execute Federated Averaging if Accumulated Params is full
-    if len(ACCUMULATED_PARAMS) == N_PUSH:
-        CENTRAL_MODEL = modman.FederatedAveragingModel(ACCUMULATED_PARAMS)
+    if len(ACCUMULATED_PARAMS) == N_CLIENTS:
+        CENTRAL_MODEL = modman.FederatedAveragingModel(
+            ACCUMULATED_PARAMS, CENTRAL_MODEL)
 
         # Update Iteration Count
         ITERATION += 1
 
         # Save Model
-        json.dump(modman.convert_tensor_to_list(
-            CENTRAL_MODEL), f'./models/{MODEL_NAME}.json')
+        with open(f'./models/{MODEL_NAME}.json', 'w') as f:
+            json.dump(modman.convert_tensor_to_list(CENTRAL_MODEL), f)
+
+        # Empty Accumulated Params
+        ACCUMULATED_PARAMS = []
 
         # Release Model Lock
         MODEL_LOCK = False

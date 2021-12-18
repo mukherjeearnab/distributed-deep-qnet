@@ -8,25 +8,24 @@ debug = False
 # Fetch Latest Model Params (StateDict)
 def fetch_params(url: str):
     # Send GET request
-    r = requests.get(url=url + '/get')
+    r = requests.get(url=url + 'get')
 
     # Extract data in json format
     data = r.json()
 
     # Check for Iteration Number (-1 Means, No model params is present on Server)
     if data['iteration'] == -1:
-        return {}, False
+        return {}, data['npush'], False
     else:
         if debug:
             print("Global Iteration", data['iteration'])
         return data['params'], data['npush'], True
 
+
 # Fetch Latest Model Params (StateDict)
-
-
 def get_model_lock(url: str) -> bool:
     # Send GET request
-    r = requests.get(url=url + '/getLock')
+    r = requests.get(url=url + 'getLock')
 
     # Extract data in json format
     data = r.json()
@@ -43,7 +42,7 @@ def send_trained_params(url: str, params: dict, train_count: int):
     }
 
     # Send POST request
-    r = requests.post(url=url + '/addParams', json=body)
+    r = requests.post(url=url + 'addParams', json=body)
 
     # Extract data in json format
     data = r.json()
@@ -61,7 +60,7 @@ def send_model_params(url: str, params: dict, lr: float):
     }
 
     # Send POST request
-    r = requests.post(url=url + '/set', json=body)
+    r = requests.post(url=url + 'set', json=body)
 
     # Extract data in json format
     data = r.json()
