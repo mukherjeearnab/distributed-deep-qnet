@@ -10,27 +10,16 @@ def update_model(grads: dict, global_model: dict, learning_rate: float) -> dict:
 
     return global_model
 
-@torch.no_grad()   
-def RMSprop_update(params,
-                    grads,
-                    square_avgs,
-                    weight_decay,
-                    lr,
-                    eps,
-                    alpha):
 
-    for i, param in enumerate(params):
-        grad = torch.Tensor(grads[i])
-        square_avg = square_avgs[i]
+@torch.no_grad()
+def FederatedAveragingModel(accu_params: list, global_model: dict) -> dict:
+    avg_model = {}
+    for key in global_model.keys():
+        avg_model[key] = torch.stack(
+            [accu_params[i][key].float() for i in range(len(accu_params))], 0).mean(0)
 
-        if weight_decay != 0:
-            grad = grad.add(param, alpha=weight_decay)
+    return avg_model
 
-        square_avg.mul_(alpha).addcmul_(grad, grad, value=1 - alpha)
-        avg = square_avg.sqrt().add_(eps)
-        param.addcdiv_(grad, avg, value=-lr)
-    return params
-    
 
 def _apply_grads(param: list, grad: list, lr: float):
 
@@ -47,6 +36,8 @@ def _apply_grads(param: list, grad: list, lr: float):
     return param_.tolist()
 
 # Convert State Dict List to Tensor
+
+
 def convert_list_to_tensor(params: dict) -> dict:
     params_ = {}
     for key in params.keys():

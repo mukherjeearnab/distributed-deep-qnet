@@ -4,10 +4,11 @@ from os import getpid
 
 debug = False
 
+
 # Fetch Latest Model Params (StateDict)
 def fetch_params(url: str):
     # Send GET request
-    r = requests.get(url=url)
+    r = requests.get(url=url + '/get')
 
     # Extract data in json format
     data = r.json()
@@ -20,12 +21,25 @@ def fetch_params(url: str):
             print("Global Iteration", data['iteration'])
         return data['params'], True
 
+# Fetch Latest Model Params (StateDict)
+
+
+def get_model_lock(url: str) -> bool:
+    # Send GET request
+    r = requests.get(url=url + '/getLock')
+
+    # Extract data in json format
+    data = r.json()
+
+    return data['lock']
+
 
 # Send Trained Model Gradients (StateDict)
-def send_model_update(url: str, grads: dict):
+def send_trained_params(url: str, params: dict, train_count: int):
     body = {
-        'grads': grads,
-        'pid': getpid()
+        'params': params,
+        'pid': getpid(),
+        'update_count': train_count
     }
 
     # Send POST request

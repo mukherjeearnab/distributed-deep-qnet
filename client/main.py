@@ -5,6 +5,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
+from time import sleep
 
 import relearn.pies.dqn as DQN
 from relearn.explore import EXP, MEM
@@ -16,7 +17,6 @@ import modman
 from queue import Queue
 import gym
 
-from copy import deepcopy
 
 debug = False
 
@@ -140,7 +140,7 @@ target = DQN.PIE(
 ##############################################
 # Fetch Initial Model Params (If Available)
 ##############################################
-global_params, is_available = modman.fetch_params(URL + 'get')
+global_params, n_push, is_available = modman.fetch_params(URL)
 
 if is_available:
     P("Model exist")
@@ -153,8 +153,9 @@ if is_available:
 else:
     P("Setting model for server")
     reply = modman.send_model_params(
-        URL + 'set', modman.convert_tensor_to_list(pie.Q.state_dict()), PIE_PARAMS.LR)
+        URL, modman.convert_tensor_to_list(pie.Q.state_dict()), PIE_PARAMS.LR)
     print(reply)
+
 
 ##############################################
 # Training
@@ -164,7 +165,7 @@ P('Start Training...')
 stamp = now()
 eps = []
 ref = []
-n_send = 1
+# n_send = 1
 n_fetch = 1
 max_reward1 = Queue(maxsize=100)
 
@@ -182,18 +183,20 @@ for epoch in range(0, TRAIN_PARAMS.EPOCHS):
 
         for _ in range(TRAIN_PARAMS.LEARN_STEPS):
             # Single Learning Step
-            grads = pie.learn(exp.memory, TRAIN_PARAMS.BATCH_SIZE)
+            pie.learn(exp.memory, TRAIN_PARAMS.BATCH_SIZE)
 
             # Send Gradients to Server
-            if((epoch+1) % n_send == 0):
-                reply = modman.send_model_update(URL + 'update', grads)
-            # print(reply)
+            if((epoch+1) % n_push == 0):
+                modman.send_trained_params(
+                    URL, modman.convert_tensor_to_list(pie.Q.state_dict()), epoch+1)
 
-            # Get Updated Model Params from Server
-            if((epoch+1) % n_fetch == 0):
-                if debug:
-                    P("Fetching model Params .....")
-                global_params, is_available = modman.fetch_params(URL + 'get')
+                # Wait for Model Lock to get Released
+                while modman.get_model_lock(URL):
+                    print("Waiting for Model Lock Release.")
+                    sleep(0.1)
+                # Get Updated Model Params from Server
+
+                global_params, _, is_available = modman.fetch_params(URL)
                 if debug:
                     P(".... Fetched model Params .....")
                 if is_available:
