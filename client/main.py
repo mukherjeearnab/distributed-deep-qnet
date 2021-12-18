@@ -247,3 +247,6 @@ pie.save(save_instance_path + '.pt')
 # Save Training Log
 with open(save_instance_path + '.csv', 'w') as f:
     f.write(LOG_CSV)
+
+modman.send_completed_model(
+    URL, modman.convert_tensor_to_list(pie.Q.state_dict()))

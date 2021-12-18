@@ -16,6 +16,7 @@ MODEL_NAME = 'experiment_01'
 
 # LOCK VAR
 MODEL_LOCK = False
+MODEL_COMPLETE = False
 
 
 app = Flask(__name__)
@@ -47,12 +48,28 @@ def get_model():
 @app.route('/api/model/getLock', methods=['GET'])
 def get_lock():
     global MODEL_LOCK
+    global MODEL_COMPLETE
     payload = {
         'model_name': MODEL_NAME,
-        'lock': MODEL_LOCK
+        'lock': MODEL_LOCK,
+        'complete': MODEL_COMPLETE
     }
 
     return jsonify(payload)
+
+
+@app.route('/api/model/setComplete', methods=['POST'])
+def set_complete():
+    global MODEL_COMPLETE
+    MODEL_COMPLETE = True
+
+    params = request.get_json()
+
+    # Save Model
+    with open(f'./models/{MODEL_NAME}.json', 'w') as f:
+        json.dump(params['model'], f)
+
+    return jsonify({'Message': 'Model Set To Complete.'})
 
 
 @app.route('/api/model/set', methods=['POST'])

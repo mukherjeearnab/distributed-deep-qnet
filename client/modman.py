@@ -22,7 +22,7 @@ def fetch_params(url: str):
         return data['params'], data['npush'], True
 
 
-# Fetch Latest Model Params (StateDict)
+# Get Model Lock
 def get_model_lock(url: str) -> bool:
     # Send GET request
     r = requests.get(url=url + 'getLock')
@@ -30,7 +30,7 @@ def get_model_lock(url: str) -> bool:
     # Extract data in json format
     data = r.json()
 
-    return data['lock']
+    return data['lock'] and not data['complete']
 
 
 # Send Trained Model Gradients (StateDict)
@@ -61,6 +61,21 @@ def send_model_params(url: str, params: dict, lr: float):
 
     # Send POST request
     r = requests.post(url=url + 'set', json=body)
+
+    # Extract data in json format
+    data = r.json()
+
+    return data
+
+
+def send_completed_model(url: str, params: dict):
+    body = {
+        'model': params,
+        'pid': getpid()
+    }
+
+    # Send POST request
+    r = requests.post(url=url + 'setComplete', json=body)
 
     # Extract data in json format
     data = r.json()
