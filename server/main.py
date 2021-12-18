@@ -9,7 +9,7 @@ CENTRAL_MODEL = {}
 ACCUMULATED_PARAMS = []
 LEARNING_RATE = 0.001
 ITERATION = -1
-N_PUSH = 20
+N_PUSH = 200
 N_CLIENTS = 2
 UPDATE_COUNT = 0
 MODEL_NAME = 'experiment_01'
@@ -45,7 +45,7 @@ def get_model():
 
 
 @app.route('/api/model/getLock', methods=['GET'])
-def get_model():
+def get_lock():
     global MODEL_LOCK
     payload = {
         'model_name': MODEL_NAME,
