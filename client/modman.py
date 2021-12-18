@@ -19,7 +19,7 @@ def fetch_params(url: str):
     else:
         if debug:
             print("Global Iteration", data['iteration'])
-        return data['params'], True
+        return data['params'], data['npush'], True
 
 # Fetch Latest Model Params (StateDict)
 
@@ -43,7 +43,7 @@ def send_trained_params(url: str, params: dict, train_count: int):
     }
 
     # Send POST request
-    r = requests.post(url=url, json=body)
+    r = requests.post(url=url + '/addParams', json=body)
 
     # Extract data in json format
     data = r.json()
@@ -61,7 +61,7 @@ def send_model_params(url: str, params: dict, lr: float):
     }
 
     # Send POST request
-    r = requests.post(url=url, json=body)
+    r = requests.post(url=url + '/set', json=body)
 
     # Extract data in json format
     data = r.json()
