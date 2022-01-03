@@ -26,9 +26,18 @@ now = datetime.datetime.now
 ALIAS = 'experiment_01'
 ENV_NAME = 'CartPole-v0'
 
+# For test locally -> ..
 # API endpoint
-URL = "http://localhost:5500/api/model/"
+#URL = "http://localhost:5500/api/model/"  # Un comment this line if you wanna test locally
+# ..
 
+# For test in the server and sepertade clients ...
+
+ip_address = "172.16.26.15"  # server macine ip address
+# API endpoint
+URL = "http://"+ip_address+":5500/api/model/"
+
+# ..
 
 class INFRA:
     """ Dummy empty class"""
@@ -61,7 +70,7 @@ TRAIN_PARAMS.EPISODIC = False
 TRAIN_PARAMS.MIN_MEM = 30
 TRAIN_PARAMS.LEARN_STEPS = 1
 TRAIN_PARAMS.BATCH_SIZE = 50
-TRAIN_PARAMS.TEST_FREQ = 20
+TRAIN_PARAMS.TEST_FREQ = 10
 
 TEST_PARAMS = INFRA()
 TEST_PARAMS.CERF = 100
@@ -154,7 +163,7 @@ stamp = now()
 eps = []
 ref = []
 
-max_reward1 = Queue(maxsize=10)
+max_reward1 = Queue(maxsize=100)
 
 P('after max_reward queue')
 exp.reset(clear_mem=True, reset_epsilon=True)
@@ -202,7 +211,7 @@ for epoch in range(0, TRAIN_PARAMS.EPOCHS):
             '[UP]'+str(pie.update_count))
 
         if(max_reward1.full()):
-            if(np.mean(max_reward1.queue) >= 195):
+            if(np.mean(max_reward1.queue) >= 200):
                 break
 
 P('Finished Training!')

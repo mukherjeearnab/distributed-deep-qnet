@@ -10,7 +10,7 @@ ITERATION = -1
 ALL_PARAMS={}
 SCORES={}
 U_TIME_STAMP = None
-WTS=10
+WTS=300
 
 # Client class to manage updates
 class CParamas:
@@ -136,7 +136,8 @@ def post_params():
     global WTS #waiting time stamp
     if (len(ALL_PARAMS))==0:
         U_TIME_STAMP=datetime.now()+timedelta(seconds=WTS)
-    elif U_TIME_STAMP<datetime.now() or len(ALL_PARAMS)==3 :
+    elif len(ALL_PARAMS)==3 :   # U_TIME_STAMP<datetime.now() or 
+        print("Update model with clients params: ", len(ALL_PARAMS))
         update_model()
     # Storing params
     ALL_PARAMS[key]=c_params
@@ -146,4 +147,7 @@ def post_params():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5500)
+    #app.run(debug=True, port=5500)
+
+    # for listening to any network
+    app.run(host="0.0.0.0", debug=False, port=5500)
