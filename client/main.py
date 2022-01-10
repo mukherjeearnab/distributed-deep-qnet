@@ -28,8 +28,8 @@ LOG_CSV = 'epoch,reward,tr,up\n'
 ##############################################
 # SETUP Hyperparameters
 ##############################################
-ALIAS = 'experiment_01'
-ENV_NAME = 'CartPole-v0'
+ALIAS = 'lunarlander_4x'
+ENV_NAME = 'LunarLander-v2'
 
 # API endpoint
 URL = "http://localhost:5500/api/model/"
@@ -43,30 +43,30 @@ class INFRA:
 
 
 EXP_PARAMS = INFRA()
-EXP_PARAMS.MEM_CAP = 50000
-EXP_PARAMS.EPST = (0.95, 0.05, 0.95)  # (start, min, max)
-EXP_PARAMS.DECAY_MUL = 0.99999
+EXP_PARAMS.MEM_CAP = 100000
+EXP_PARAMS.EPST = (1.0, 0.01, 1.0)  # (start, min, max)
+EXP_PARAMS.DECAY_MUL = 0.996
 EXP_PARAMS.DECAY_ADD = 0
 
 
 PIE_PARAMS = INFRA()
 PIE_PARAMS.LAYERS = [128, 128, 128]
-PIE_PARAMS.OPTIM = torch.optim.RMSprop  # SGD
+PIE_PARAMS.OPTIM = torch.optim.RMSprop
 PIE_PARAMS.LOSS = torch.nn.MSELoss
 PIE_PARAMS.LR = 0.001
-PIE_PARAMS.DISCOUNT = 0.999999
+PIE_PARAMS.DISCOUNT = 0.99
 PIE_PARAMS.DOUBLE = False
-PIE_PARAMS.TUF = 4
+PIE_PARAMS.TUF = 0
 PIE_PARAMS.DEV = 'cpu'
 
 TRAIN_PARAMS = INFRA()
-TRAIN_PARAMS.EPOCHS = 50000
+TRAIN_PARAMS.EPOCHS = 500000
 TRAIN_PARAMS.MOVES = 10
 TRAIN_PARAMS.EPISODIC = False
-TRAIN_PARAMS.MIN_MEM = 30
+TRAIN_PARAMS.BATCH_SIZE = 64
+TRAIN_PARAMS.MIN_MEM = TRAIN_PARAMS.BATCH_SIZE*5
 TRAIN_PARAMS.LEARN_STEPS = 1
-TRAIN_PARAMS.BATCH_SIZE = 50
-TRAIN_PARAMS.TEST_FREQ = 20
+TRAIN_PARAMS.TEST_FREQ = 100
 
 TEST_PARAMS = INFRA()
 TEST_PARAMS.CERF = 100
@@ -167,7 +167,7 @@ eps = []
 ref = []
 # n_send = 1
 n_fetch = 1
-max_reward1 = Queue(maxsize=100)
+max_reward1 = Queue(maxsize=10)
 
 P('after max_reward queue')
 exp.reset(clear_mem=True, reset_epsilon=True)
